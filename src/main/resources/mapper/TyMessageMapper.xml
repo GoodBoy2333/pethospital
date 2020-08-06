@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ty.pethospital.Mapper.TyMessageMapper">
+    <resultMap id="BaseResultMap" type="com.ty.pethospital.Entity.TyMessage">
+        <!--@mbg.generated-->
+        <!--@Table ty_message-->
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="userId" jdbcType="VARCHAR" property="userid"/>
+        <result column="createTime" jdbcType="TIMESTAMP" property="createtime"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="content" jdbcType="LONGVARCHAR" property="content"/>
+        <result column="replContent" jdbcType="LONGVARCHAR" property="replcontent"/>
+        <result column="deplTime" jdbcType="TIMESTAMP" property="depltime"/>
+        <result column="userName" jdbcType="VARCHAR" property="userName"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, userId, createTime, title, content, replContent, deplTime
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ty_message
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        <!--@mbg.generated-->
+        delete from ty_message
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.ty.pethospital.Entity.TyMessage">
+        <!--@mbg.generated-->
+        insert into ty_message (id, userId, createTime,
+        title, content, replContent,
+        deplTime)
+        values (#{id,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP},
+        #{title,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}, #{replcontent,jdbcType=LONGVARCHAR},
+        #{depltime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.ty.pethospital.Entity.TyMessage">
+        <!--@mbg.generated-->
+        insert into ty_message
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userid != null">
+                userId,
+            </if>
+            <if test="createtime != null">
+                createTime,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="replcontent != null">
+                replContent,
+            </if>
+            <if test="depltime != null">
+                deplTime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="userid != null">
+                #{userid,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                #{createtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="replcontent != null">
+                #{replcontent,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="depltime != null">
+                #{depltime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ty.pethospital.Entity.TyMessage">
+        <!--@mbg.generated-->
+        update ty_message
+        <set>
+            <if test="userid != null">
+                userId = #{userid,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                createTime = #{createtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                content = #{content,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="replcontent != null">
+                replContent = #{replcontent,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="depltime != null">
+                deplTime = #{depltime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ty.pethospital.Entity.TyMessage">
+        <!--@mbg.generated-->
+        update ty_message
+        set userId = #{userid,jdbcType=VARCHAR},
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+        title = #{title,jdbcType=VARCHAR},
+        content = #{content,jdbcType=LONGVARCHAR},
+        replContent = #{replcontent,jdbcType=LONGVARCHAR},
+        deplTime = #{depltime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="findByAll" resultMap="BaseResultMap">
+        SELECT mes.*,user.userName
+        FROM `ty_message` mes
+        LEFT JOIN ty_user user on mes.userId=user.id
+        <where>
+            <if test="id != null">
+                and mes.id=#{id,jdbcType=VARCHAR}
+            </if>
+            <if test="userid != null and userid!=''">
+                and mes.userId=#{userid,jdbcType=VARCHAR}
+            </if>
+            <if test="createtime != null">
+                and mes.createTime=#{createtime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="title != null and title!=''">
+                and mes.title like concat('%',#{title,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="content != null">
+                and mes.content=#{content,jdbcType=LONGVARCHAR}
+            </if>
+            <if test="replcontent != null">
+                and mes.replContent=#{replcontent,jdbcType=LONGVARCHAR}
+            </if>
+            <if test="depltime != null">
+                and mes.deplTime=#{depltime,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+    </select>
+</mapper>

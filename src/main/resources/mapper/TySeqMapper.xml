@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ty.pethospital.Mapper.TySeqMapper">
+  <resultMap id="BaseResultMap" type="com.ty.pethospital.Entity.TySeq">
+    <!--@mbg.generated-->
+    <!--@Table ty_seq-->
+    <id column="name" jdbcType="VARCHAR" property="name" />
+    <result column="value" jdbcType="INTEGER" property="value" />
+    <result column="updateTime" jdbcType="DATE" property="updatetime" />
+    <result column="createTime" jdbcType="DATE" property="createtime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    `name`, `value`, updateTime, createTime
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from ty_seq
+    where `name` = #{name,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    <!--@mbg.generated-->
+    delete from ty_seq
+    where `name` = #{name,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.ty.pethospital.Entity.TySeq">
+    <!--@mbg.generated-->
+    insert into ty_seq (`name`, `value`, updateTime, 
+      createTime)
+    values (#{name,jdbcType=VARCHAR}, #{value,jdbcType=INTEGER}, #{updatetime,jdbcType=DATE}, 
+      #{createtime,jdbcType=DATE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ty.pethospital.Entity.TySeq">
+    <!--@mbg.generated-->
+    insert into ty_seq
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        `name`,
+      </if>
+      <if test="value != null">
+        `value`,
+      </if>
+      <if test="updatetime != null">
+        updateTime,
+      </if>
+      <if test="createtime != null">
+        createTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null">
+        #{value,jdbcType=INTEGER},
+      </if>
+      <if test="updatetime != null">
+        #{updatetime,jdbcType=DATE},
+      </if>
+      <if test="createtime != null">
+        #{createtime,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ty.pethospital.Entity.TySeq">
+    <!--@mbg.generated-->
+    update ty_seq
+    <set>
+      <if test="value != null">
+        `value` = #{value,jdbcType=INTEGER},
+      </if>
+      <if test="updatetime != null">
+        updateTime = #{updatetime,jdbcType=DATE},
+      </if>
+      <if test="createtime != null">
+        createTime = #{createtime,jdbcType=DATE},
+      </if>
+    </set>
+    where `name` = #{name,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ty.pethospital.Entity.TySeq">
+    <!--@mbg.generated-->
+    update ty_seq
+    set `value` = #{value,jdbcType=INTEGER},
+      updateTime = #{updatetime,jdbcType=DATE},
+      createTime = #{createtime,jdbcType=DATE}
+    where `name` = #{name,jdbcType=VARCHAR}
+  </update>
+</mapper>

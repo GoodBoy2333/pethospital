@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ty.pethospital.Mapper.TyUserMapper">
+    <resultMap id="BaseResultMap" type="com.ty.pethospital.Entity.TyUser">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="userName" jdbcType="VARCHAR" property="username"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="nickName" jdbcType="VARCHAR" property="nickname"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="birthday" jdbcType="TIMESTAMP" property="birthday"/>
+        <result column="sex" jdbcType="VARCHAR" property="sex"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="createTime" jdbcType="TIMESTAMP" property="createtime"/>
+        <result column="updateTime" jdbcType="TIMESTAMP" property="updatetime"/>
+        <result column="lastLoginTime" jdbcType="TIMESTAMP" property="lastlogintime"/>
+        <result column="user_type" jdbcType="VARCHAR" property="userType"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, userName, `password`, nickName, phone, email, birthday, sex, `status`, createTime,
+    updateTime, lastLoginTime, user_type
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ty_user
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete from ty_user
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.ty.pethospital.Entity.TyUser">
+        insert into ty_user (id, userName, `password`,
+        nickName, phone, email,
+        birthday, sex, `status`,
+        createTime, updateTime, lastLoginTime,
+        user_type)
+        values (#{id,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+        #{nickname,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+        #{birthday,jdbcType=TIMESTAMP}, #{sex,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
+        #{createtime,jdbcType=TIMESTAMP}, #{updatetime,jdbcType=TIMESTAMP}, #{lastlogintime,jdbcType=TIMESTAMP},
+        #{userType,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.ty.pethospital.Entity.TyUser">
+        insert into ty_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="username != null">
+                userName,
+            </if>
+            <if test="password != null">
+                `password`,
+            </if>
+            <if test="nickname != null">
+                nickName,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="birthday != null">
+                birthday,
+            </if>
+            <if test="sex != null">
+                sex,
+            </if>
+            <if test="status != null">
+                `status`,
+            </if>
+            <if test="createtime != null">
+                createTime,
+            </if>
+            <if test="updatetime != null">
+                updateTime,
+            </if>
+            <if test="lastlogintime != null">
+                lastLoginTime,
+            </if>
+            <if test="userType != null">
+                user_type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="username != null">
+                #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="nickname != null">
+                #{nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="birthday != null">
+                #{birthday,jdbcType=TIMESTAMP},
+            </if>
+            <if test="sex != null">
+                #{sex,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                #{createtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatetime != null">
+                #{updatetime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lastlogintime != null">
+                #{lastlogintime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userType != null">
+                #{userType,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ty.pethospital.Entity.TyUser">
+        update ty_user
+        <set>
+            <if test="username != null">
+                userName = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                `password` = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="nickname != null">
+                nickName = #{nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday,jdbcType=TIMESTAMP},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                `status` = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                createTime = #{createtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatetime != null">
+                updateTime = #{updatetime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lastlogintime != null">
+                lastLoginTime = #{lastlogintime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userType != null">
+                user_type = #{userType,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ty.pethospital.Entity.TyUser">
+        update ty_user
+        set userName = #{username,jdbcType=VARCHAR},
+        `password` = #{password,jdbcType=VARCHAR},
+        nickName = #{nickname,jdbcType=VARCHAR},
+        phone = #{phone,jdbcType=VARCHAR},
+        email = #{email,jdbcType=VARCHAR},
+        birthday = #{birthday,jdbcType=TIMESTAMP},
+        sex = #{sex,jdbcType=VARCHAR},
+        `status` = #{status,jdbcType=VARCHAR},
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+        updateTime = #{updatetime,jdbcType=TIMESTAMP},
+        lastLoginTime = #{lastlogintime,jdbcType=TIMESTAMP},
+        user_type = #{userType,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="findOneByUsername" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ty_user
+        where userName=#{username,jdbcType=VARCHAR}
+    </select>
+
+    <select id="findOneUserByparm" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ty_user
+        where userName=#{username,jdbcType=VARCHAR} and email=#{email,jdbcType=VARCHAR} and
+        phone=#{phone,jdbcType=VARCHAR}
+    </select>
+
+    <update id="updateByUsername">
+        update ty_user
+        <set>
+            <if test="updated.id != null">
+                id = #{updated.id,jdbcType=VARCHAR},
+            </if>
+            <if test="updated.username != null">
+                userName = #{updated.username,jdbcType=VARCHAR},
+            </if>
+            <if test="updated.password != null">
+                password = #{updated.password,jdbcType=VARCHAR},
+            </if>
+            <if test="updated.nickname != null">
+                nickName = #{updated.nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="updated.phone != null">
+                phone = #{updated.phone,jdbcType=VARCHAR},
+            </if>
+            <if test="updated.email != null">
+                email = #{updated.email,jdbcType=VARCHAR},
+            </if>
+            <if test="updated.birthday != null">
+                birthday = #{updated.birthday,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updated.sex != null">
+                sex = #{updated.sex,jdbcType=VARCHAR},
+            </if>
+            <if test="updated.status != null">
+                status = #{updated.status,jdbcType=VARCHAR},
+            </if>
+            <if test="updated.createtime != null">
+                createTime = #{updated.createtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updated.updatetime != null">
+                updateTime = #{updated.updatetime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updated.lastlogintime != null">
+                lastLoginTime = #{updated.lastlogintime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updated.userType != null">
+                user_type = #{updated.userType,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where userName=#{username,jdbcType=VARCHAR}
+    </update>
+
+    <select id="findByAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ty_user
+        <where>
+            <if test="id != null">
+                and id=#{id,jdbcType=VARCHAR}
+            </if>
+            <if test="username != null and username != ''">
+                and userName like concat('%',#{username,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="password != null">
+                and `password`=#{password,jdbcType=VARCHAR}
+            </if>
+            <if test="nickname != null">
+                and nickName=#{nickname,jdbcType=VARCHAR}
+            </if>
+            <if test="phone != null">
+                and phone=#{phone,jdbcType=VARCHAR}
+            </if>
+            <if test="email != null">
+                and email=#{email,jdbcType=VARCHAR}
+            </if>
+            <if test="birthday != null">
+                and birthday=#{birthday,jdbcType=TIMESTAMP}
+            </if>
+            <if test="sex != null">
+                and sex=#{sex,jdbcType=VARCHAR}
+            </if>
+            <if test="status != null">
+                and `status`=#{status,jdbcType=VARCHAR}
+            </if>
+            <if test="createtime != null">
+                and createTime=#{createtime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="updatetime != null">
+                and updateTime=#{updatetime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="lastlogintime != null">
+                and lastLoginTime=#{lastlogintime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="userType != null">
+                and user_type=#{userType,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by updateTime desc
+    </select>
+
+    <select id="countByUsername" resultType="int">
+        select count(1)
+        from ty_user
+        where userName=#{username,jdbcType=VARCHAR}
+    </select>
+</mapper>

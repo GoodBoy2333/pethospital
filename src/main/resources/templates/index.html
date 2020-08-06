@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <!--公共头部引入-->
+    <div th:replace="Common/head :: head"></div>
+</head>
+<body>
+<!--style="background: url(./resource/bg/bg.jpg);padding-bottom: 18%;"-->
+<div id="app">
+    <el-container>
+        <el-header height="260px">
+            <el-row style="margin-top: 80px;">
+<!--                <el-image src="./resource/bg/bg.jpg" fit="cover"></el-image>-->
+                <el-col :span="6" :offset="10" style="font-family: 华文楷体;font-size: 35px;">宠物医院管理系统</el-col>
+            </el-row>
+        </el-header>
+        <el-main>
+            <el-row :gutter="20">
+                <el-col :span="16" :offset="2">
+                    <el-carousel :interval="4000" type="card" >
+                        <el-carousel-item v-for="(item,index) in imgPath" :key="index">
+                            <el-image
+                                    :src="item.path"
+                                    :fit="item.fit"></el-image>
+                        </el-carousel-item>
+                    </el-carousel>
+                </el-col>
+                <el-col :span="4">
+                    <el-form :model="login" :rules="rules" ref="loginForm">
+                        <el-form-item label="用户名" prop="userName">
+                            <el-input v-model="login.userName"></el-input>
+                        </el-form-item>
+                        <el-form-item label="密码" prop="password">
+                            <el-input type="password" v-model="login.password" autocomplete="off" @keyup.enter.native="submit('loginForm')"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="submit('loginForm')">登录</el-button>
+                            <el-button @click="toReg">注册</el-button>
+                            <el-button @click="foeget">忘记密码</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-col>
+            </el-row>
+        </el-main>
+    </el-container>
+</div>
+</body>
+<!--公共底部部引入-->
+<div th:replace="Common/footer :: footer"></div>
+<script type="text/javascript">
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                imgPath: [{
+                    path: './resource/img/1.jpg',
+                    fit: 'scale-down'
+                }, {
+                    path: './resource/img/2.jpg',
+                    fit: 'scale-down'
+                }, {
+                    path: './resource/img/3.png',
+                    fit: 'scale-down'
+                }],
+                rules: {
+                    userName: [
+                        {required: true, message: '请输入用户名', trigger: 'blur'}
+                    ],
+                    password: [
+                        {required: true, message: '请输入密码', trigger: 'blur'}
+                    ],
+                },
+                login: {
+                    userName: '',
+                    password: ''
+                }
+            }
+        },
+        methods: {
+            submit(formName) {
+                this.$refs[formName].validate(async (valid) => {
+                    if (valid) {
+                        let res = await axios.post('/user/login', Qs.stringify(this.login));
+                        if (res.data.status == 1) {
+                            this.$message({
+                                showClose: true,
+                                duration:1000,
+                                message: '登录成功',
+                                type: 'success',
+                                onClose:function () {
+                                    sessionStorage.setItem("user",JSON.stringify(res.data.data.user));
+                                    window.location.href = res.data.data.path;
+                                }
+                            });
+                        } else {
+                            this.$message({
+                                showClose: true,
+                                message: '登录失败：'+res.data.message,
+                                type: 'error'
+                            });
+                        }
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            toReg(){
+                window.location.href="/user";
+            },
+            foeget(){
+                window.location.href="/user/forget";
+            },
+        }
+    });
+</script>
+</html>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ty.pethospital.Mapper.TyWatchMapper">
+    <resultMap id="BaseResultMap" type="com.ty.pethospital.Entity.TyWatch">
+        <!--@mbg.generated-->
+        <!--@Table ty_watch-->
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="userId" jdbcType="VARCHAR" property="userid"/>
+        <result column="createTime" jdbcType="TIMESTAMP" property="createtime"/>
+        <result column="petId" jdbcType="VARCHAR" property="petid"/>
+        <result column="userName" jdbcType="VARCHAR" property="userName"/>
+        <result column="petName" jdbcType="VARCHAR" property="petName"/>
+        <result column="wachstatus" jdbcType="VARCHAR" property="wachstatus"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, `status`, userId, createTime, petId
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ty_watch
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        <!--@mbg.generated-->
+        delete from ty_watch
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.ty.pethospital.Entity.TyWatch">
+        <!--@mbg.generated-->
+        insert into ty_watch (id, `status`, userId,
+        createTime, petId)
+        values (#{id,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR},
+        #{createtime,jdbcType=TIMESTAMP}, #{petid,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.ty.pethospital.Entity.TyWatch">
+        <!--@mbg.generated-->
+        insert into ty_watch
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="status != null">
+                `status`,
+            </if>
+            <if test="userid != null">
+                userId,
+            </if>
+            <if test="createtime != null">
+                createTime,
+            </if>
+            <if test="petid != null">
+                petId,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="userid != null">
+                #{userid,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                #{createtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="petid != null">
+                #{petid,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ty.pethospital.Entity.TyWatch">
+        <!--@mbg.generated-->
+        update ty_watch
+        <set>
+            <if test="status != null">
+                `status` = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="userid != null">
+                userId = #{userid,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                createTime = #{createtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="petid != null">
+                petId = #{petid,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ty.pethospital.Entity.TyWatch">
+        <!--@mbg.generated-->
+        update ty_watch
+        set `status` = #{status,jdbcType=VARCHAR},
+        userId = #{userid,jdbcType=VARCHAR},
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+        petId = #{petid,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="findByAll" resultMap="BaseResultMap">
+        SELECT
+        wa.* ,user.userName userName,pet.`name` petName,dict.dict_value wachstatus
+        FROM
+        `ty_watch` wa
+        LEFT JOIN ty_user user on user.id=wa.userId
+        LEFT JOIN ty_pet pet on pet.id=wa.petId
+        LEFT JOIN ty_dict dict on dict.dict_key=wa.`status`
+        <where>
+            <if test="id != null">
+                and wa.id=#{id,jdbcType=VARCHAR}
+            </if>
+            <if test="status != null">
+                and wa.`status`=#{status,jdbcType=VARCHAR}
+            </if>
+            <if test="userid != null">
+                and wa.userId=#{userid,jdbcType=VARCHAR}
+            </if>
+            <if test="createtime != null">
+                and wa.createTime=#{createtime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="petid != null">
+                and wa.petId=#{petid,jdbcType=VARCHAR}
+            </if>
+            <if test="userName != null and userName != ''">
+                and user.userName like concat('%',#{userName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="petName != null and petName != ''">
+                and pet.`name` like concat('%',#{petName,jdbcType=VARCHAR},'%')
+            </if>
+        </where>
+    </select>
+</mapper>

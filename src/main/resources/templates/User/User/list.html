@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <!--公共头部引入-->
+    <div th:replace="Common/head :: head"></div>
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <el-main>
+            <el-form :inline="true" :model="search">
+                <el-form-item label="用户名">
+                    <el-input v-model="search.userName" placeholder="用户名"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="getUserInfo" icon="el-icon-search" round>查询</el-button>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="action = true" icon="el-icon-plus" round>新增</el-button>
+                </el-form-item>
+            </el-form>
+            <el-table :data="userList" empty-text="用户列表为空">
+                <el-table-column prop="username" label="用户名"></el-table-column>
+                <el-table-column prop="nickname" label="昵称"></el-table-column>
+                <el-table-column prop="phone" label="手机"></el-table-column>
+                <el-table-column prop="email" label="邮箱"></el-table-column>
+                <el-table-column prop="birthday" label="生日"></el-table-column>
+                <el-table-column prop="sex" label="性别">
+                    <template slot-scope="scope">
+                        {{ scope.row.sex==1?'男':scope.row.sex==0?'女':'保密'}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="status" label="用户状态">
+                    <template slot-scope="scope">
+                        {{ scope.row.status==1?'启用':'禁用'}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="createtime" label="创建时间" width="160">
+                </el-table-column>
+                <el-table-column prop="lastlogintime" label="最后登录时间" width="160">
+                </el-table-column>
+                <el-table-column prop="userType" label="用户类型">
+                    <template slot-scope="scope">
+                        {{ deType(scope.row.userType)}}
+                    </template>
+                </el-table-column>
+                <el-table-column fixed="right" label="操作" width="150">
+                    <template slot-scope="scope">
+                        <el-button
+                                size="mini"
+                                @click="handleEdit(scope.$index, scope.row)">编辑
+                        </el-button>
+                        <el-button
+                                size="mini"
+                                type="danger"
+                                @click="handleDelete(scope.$index, scope.row)">删除
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination
+                    class="pull-right"
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="currentPage"
+                    :page-sizes="[5, 10, 20, 30, 40]"
+                    :page-size="pageSize"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+            </el-pagination>
+
+            <el-dialog title="操作" :visible.sync="action" :modal="false" width="40%" top="0vh" @close="handleClose">
+                <el-form ref="actionForm" :model="actionObj" :rules="rules" label-width="80px">
+                    <el-form-item label="用户名" prop="username">
+                        <el-input v-model="actionObj.username"></el-input>
+                    </el-form-item>
+                    <el-form-item label="密码" prop="password">
+                        <el-input v-model="actionObj.password"></el-input>
+                    </el-form-item>
+                    <el-form-item label="昵称" prop="nickname">
+                        <el-input v-model="actionObj.nickname"></el-input>
+                    </el-form-item>
+                    <el-form-item label="手机" prop="phone">
+                        <el-input v-model="actionObj.phone"></el-input>
+                    </el-form-item>
+                    <el-form-item label="邮箱" prop="email">
+                        <el-input v-model="actionObj.email"></el-input>
+                    </el-form-item>
+                    <el-form-item label="生日" prop="birthday">
+                        <el-date-picker type="date" v-model="actionObj.birthday"
+                                        value-format="yyyy-MM-dd"></el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="性别" prop="sex">
+                        <el-select v-model="actionObj.sex" placeholder="请选择性别">
+                            <el-option label="男" value="1"></el-option>
+                            <el-option label="女" value="0"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="用户状态" prop="status">
+                        <el-select v-model="actionObj.status" placeholder="请选择用户状态">
+                            <el-option label="启用" value="1"></el-option>
+                            <el-option label="禁用" value="0"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="用户类型" prop="userType">
+                        <el-select v-model="actionObj.userType" placeholder="请选择用户类型">
+                            <el-option label="管理员" value="admin"></el-option>
+                            <el-option label="用户" value="user"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="action = false">取 消</el-button>
+                    <el-button type="primary" @click="handleAction">确 定</el-button>
+                </span>
+            </el-dialog>
+        </el-main>
+    </el-container>
+</div>
+</body>
+<!--公共底部部引入-->
+<div th:replace="Common/footer :: footer"></div>
+<script>
+    new Vue({
+        el: "#app",
+        data() {
+            var checkUserPhone = async (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入手机号码'));
+                } else if (!(/^1[3456789]\d{9}$/.test(value))) {
+                    callback(new Error('手机号码有误'));
+                } else {
+                    callback();
+                }
+            };
+            return {
+                currentPage: 1,
+                pageSize: 5,
+                total: 0,
+                userList: [],
+                search: {
+                    userName: null
+                },
+                action: false,
+                actionObj: {},
+                rules: {
+                    username: [
+                        {required: true, message: '请输入用户名', trigger: 'blur'},
+                    ],
+                    password: [
+                        {required: true, message: '请输入密码', trigger: 'blur'},
+                        {min: 6, max: 12, message: '长度在 6 到 12 个字符', trigger: 'blur'}
+                    ],
+                    nickname: [
+                        {required: true, message: '请输入昵称', trigger: 'blur'},
+                    ],
+                    phone: [
+                        {validator: checkUserPhone, trigger: 'blur'},
+                    ],
+                    email: [
+                        {required: true, message: '请输入邮箱地址', trigger: 'blur'},
+                        {type: 'email', message: '请输入正确的邮箱地址', trigger: ['change']}
+                    ],
+                    birthday: [
+                        {required: true, message: '请选择生日', trigger: 'blur'},
+                    ],
+                    sex: [
+                        {required: true, message: '请选择性别', trigger: 'change'},
+                    ],
+                    status: [
+                        {required: true, message: '请选择用户状态', trigger: 'change'},
+                    ],
+                    userType: [
+                        {required: true, message: '请选择用户类型', trigger: 'change'},
+                    ]
+                },
+            }
+        },
+        methods: {
+            handleSizeChange(val) {
+                this.pageSize = val;
+                this.getUserInfo();
+            },
+            handleCurrentChange(val) {
+                this.currentPage = val;
+                this.getUserInfo();
+            },
+            handleClose() {
+                this.actionObj = {};
+                this.$refs['actionForm'].clearValidate();
+                this.getUserInfo();
+            },
+            handleEdit(index, row) {
+                this.action = true;
+                this.actionObj = JSON.parse(JSON.stringify(row));
+                this.actionObj.password = '';
+                this.actionObj.authorities = '';
+            },
+            handleDelete(index, row) {
+                this.$confirm('确定删除该用户吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(async () => {
+                    let res = await axios.delete('/user/' + row.id, Qs.stringify(this.actionObj));
+                    if (res.data.status == 1) {
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                        this.getUserInfo();
+                    } else {
+                        this.$message.error('删除失败，错误：' + res.data.message);
+                    }
+
+                });
+            },
+            async handleAction() {
+                this.$refs['actionForm'].validate(async (valid) => {
+                    if (valid) {
+                        let res = await axios.post('/user', Qs.stringify(this.actionObj));
+                        if (res.data.status == 1) {
+                            this.$message({
+                                showClose: true,
+                                duration: 1000,
+                                message: '操作成功',
+                                type: 'success',
+                                onClose: function () {
+                                    this.getUserInfo();
+                                }
+                            });
+                            this.action = false;
+                        } else {
+                            this.$message({
+                                showClose: true,
+                                message: '操作失败：' + res.data.message,
+                                type: 'error'
+                            });
+                        }
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            async getUserInfo() {
+                let res = await axios.post('/user/list', Qs.stringify({
+                    currentPage: this.currentPage,
+                    pageSize: this.pageSize,
+                    username: this.search.userName
+                }));
+                !!res.data.data.list ? this.userList = res.data.data.list : this.userList = [];
+                !!res.data.data.total ? this.total = res.data.data.total : this.total = 0;
+            },
+            deType(userType) {
+                switch (userType) {
+                    case 'user':
+                        return "用户";
+                        break;
+                    case 'admin':
+                        return "管理员";
+                        break;
+                    case 'doctor':
+                        return "医生";
+                        break;
+                }
+            }
+        },
+        mounted() {
+            this.getUserInfo();
+        }
+    })
+</script>
+</html>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ty.pethospital.Mapper.TyDictMapper">
+  <resultMap id="BaseResultMap" type="com.ty.pethospital.Entity.TyDict">
+    <!--@mbg.generated-->
+    <!--@Table ty_dict-->
+    <id column="dict_key" jdbcType="VARCHAR" property="dictKey" />
+    <result column="dict_value" jdbcType="VARCHAR" property="dictValue" />
+    <result column="dict_type" jdbcType="VARCHAR" property="dictType" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    dict_key, dict_value, dict_type
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from ty_dict
+    where dict_key = #{dictKey,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    <!--@mbg.generated-->
+    delete from ty_dict
+    where dict_key = #{dictKey,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.ty.pethospital.Entity.TyDict">
+    <!--@mbg.generated-->
+    insert into ty_dict (dict_key, dict_value, dict_type
+      )
+    values (#{dictKey,jdbcType=VARCHAR}, #{dictValue,jdbcType=VARCHAR}, #{dictType,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ty.pethospital.Entity.TyDict">
+    <!--@mbg.generated-->
+    insert into ty_dict
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="dictKey != null">
+        dict_key,
+      </if>
+      <if test="dictValue != null">
+        dict_value,
+      </if>
+      <if test="dictType != null">
+        dict_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="dictKey != null">
+        #{dictKey,jdbcType=VARCHAR},
+      </if>
+      <if test="dictValue != null">
+        #{dictValue,jdbcType=VARCHAR},
+      </if>
+      <if test="dictType != null">
+        #{dictType,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ty.pethospital.Entity.TyDict">
+    <!--@mbg.generated-->
+    update ty_dict
+    <set>
+      <if test="dictValue != null">
+        dict_value = #{dictValue,jdbcType=VARCHAR},
+      </if>
+      <if test="dictType != null">
+        dict_type = #{dictType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where dict_key = #{dictKey,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ty.pethospital.Entity.TyDict">
+    <!--@mbg.generated-->
+    update ty_dict
+    set dict_value = #{dictValue,jdbcType=VARCHAR},
+      dict_type = #{dictType,jdbcType=VARCHAR}
+    where dict_key = #{dictKey,jdbcType=VARCHAR}
+  </update>
+
+  <select id="findByAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ty_dict
+        <where>
+            <if test="dictKey != null">
+                and dict_key=#{dictKey,jdbcType=VARCHAR}
+            </if>
+            <if test="dictValue != null">
+                and dict_value=#{dictValue,jdbcType=VARCHAR}
+            </if>
+            <if test="dictType != null">
+                and dict_type=#{dictType,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <!--公共头部引入-->
+    <div th:replace="Common/head :: head"></div>
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <el-main>
+            <el-form :inline="true" :model="search">
+                <el-form-item label="用户名">
+                    <el-input v-model="search.userName" placeholder="用户名"></el-input>
+                </el-form-item>
+                <el-form-item label="宠物名">
+                    <el-input v-model="search.petname" placeholder="宠物名"></el-input>
+                </el-form-item>
+                <el-form-item label="就诊状态">
+                    <el-select v-model="search.status" clearable placeholder="请选择就诊状态">
+                        <el-option label="就诊中" value="diaing"></el-option>
+                        <el-option label="已出院" value="diaSuccess"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="挂号编号">
+                    <el-input v-model="search.registerid" placeholder="挂号编号"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="getDiaInfo" icon="el-icon-search" round>查询</el-button>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="action = true" icon="el-icon-plus" round>新增</el-button>
+                </el-form-item>
+            </el-form>
+
+            <el-table
+                    :data="diaList"
+                    empty-text="就诊列表为空">
+                <el-table-column prop="id" label="就诊编号"></el-table-column>
+                <el-table-column prop="registerid" label="挂号编号"></el-table-column>
+                <el-table-column prop="money" label="金额"></el-table-column>
+                <el-table-column prop="desc" label="就诊情况">
+                    <template slot-scope="scope">
+                        {{ scope.row.desc}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="createtime" label="创建时间"></el-table-column>
+                <el-table-column prop="userName" label="所属用户"></el-table-column>
+                <el-table-column prop="diastatus" label="就诊状态"></el-table-column>
+                <el-table-column prop="regdesc" label="挂号简介">
+                    <template slot-scope="scope">
+                        {{ scope.row.regdesc}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="petname" label="宠物名称"></el-table-column>
+                <el-table-column fixed="right" label="操作" width="150">
+                    <template slot-scope="scope">
+                        <el-button
+                                size="mini"
+                                @click="handleEdit(scope.$index, scope.row)">编辑
+                        </el-button>
+                        <el-button
+                                size="mini"
+                                type="danger"
+                                @click="handleDelete(scope.$index, scope.row)">删除
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination
+                    class="pull-right"
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="currentPage"
+                    :page-sizes="[5, 10, 20, 30, 40]"
+                    :page-size="pageSize"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+            </el-pagination>
+
+            <el-dialog
+                    title="操作"
+                    :visible.sync="action"
+                    :modal="false"
+                    width="40%"
+                    top="0vh"
+                    @close="handleClose">
+                <el-form ref="actionForm" :model="actionObj" :rules="rules" label-width="80px">
+                    <el-form-item label="挂号编号" prop="registerid">
+                        <el-select v-model="actionObj.registerid" clearable filterable remote placeholder="请输入挂号编号"
+                                   :remote-method="remoteMethodReg" :loading="loading">
+                            <el-option
+                                    v-for="(item, index) in regList"
+                                    :key="index"
+                                    :label="item.id"
+                                    :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="金额" prop="money">
+                        <el-input v-model="actionObj.money"></el-input>
+                    </el-form-item>
+                    <el-form-item label="诊断情况" prop="desc">
+                        <el-input type="textarea" v-model="actionObj.desc"></el-input>
+                    </el-form-item>
+                    <el-form-item label="创建时间" prop="createtime">
+                        <el-date-picker
+                                v-model="actionObj.createtime"
+                                type="datetime"
+                                placeholder="选择日期时间"
+                                value-format="yyyy-MM-dd HH:mm:ss">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="就诊状态" prop="status">
+                        <el-select v-model="actionObj.status" placeholder="请选择就诊状态">
+                            <el-option label="就诊中" value="diaing"></el-option>
+                            <el-option label="已出院" value="diaSuccess"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="action = false">取 消</el-button>
+                    <el-button type="primary" @click="handleAction">确 定</el-button>
+                </span>
+            </el-dialog>
+        </el-main>
+    </el-container>
+</div>
+</body>
+<!--公共底部部引入-->
+<div th:replace="Common/footer :: footer"></div>
+<script>
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                currentPage: 1,
+                pageSize: 5,
+                total: 0,
+                diaList: [],
+                userList: [],
+                regList: [],
+                search: {},
+                loading: false,
+                action: false,
+                actionObj: {},
+                rules: {
+                    registerid: [
+                        {required: true, message: '请选择挂号编号', trigger: 'change'},
+                    ],
+                    createtime: [
+                        {required: true, message: '请选择创建时间', trigger: 'blur'},
+                    ],
+                    status: [
+                        {required: true, message: '请选择状态', trigger: 'change'},
+                    ],
+                },
+            }
+        },
+        methods: {
+            handleSizeChange(val) {
+                this.pageSize = val;
+                this.getDiaInfo();
+            },
+            handleCurrentChange(val) {
+                this.currentPage = val;
+                this.getDiaInfo();
+            },
+            handleClose() {
+                this.actionObj = {};
+                this.$refs['actionForm'].clearValidate();
+                this.getDiaInfo();
+            },
+            handleEdit(index, row) {
+                this.action = true;
+                this.actionObj = JSON.parse(JSON.stringify(row));
+            },
+            handleDelete(index, row) {
+                this.$confirm('确定删除该记录吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(async () => {
+                    let res = await axios.delete('/dia/' + row.id, Qs.stringify(this.actionObj));
+                    if (res.data.status == 1) {
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                        this.getDiaInfo();
+                    } else {
+                        this.$message.error('删除失败，错误：' + res.data.message);
+                    }
+
+                });
+            },
+            async handleAction() {
+                this.$refs['actionForm'].validate(async (valid) => {
+                    if (valid) {
+                        let res = await axios.post('/dia', Qs.stringify(this.actionObj));
+                        if (res.data.status == 1) {
+                            this.$message({
+                                showClose: true,
+                                duration: 1000,
+                                message: '操作成功',
+                                type: 'success'
+                            });
+                            this.action = false;
+                            this.getDiaInfo();
+                        } else {
+                            this.$message({
+                                showClose: true,
+                                message: '操作失败：' + res.data.message,
+                                type: 'error'
+                            });
+                        }
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            async getDiaInfo() {
+                let res = await axios.post('/dia/list', Qs.stringify({
+                    currentPage: this.currentPage,
+                    pageSize: this.pageSize,
+                    userName: this.search.userName,
+                    petname: this.search.petname,
+                    status: this.search.status,
+                    registerid: this.search.registerid
+                }));
+                !!res.data.data.list ? this.diaList = res.data.data.list : this.diaList = [];
+                !!res.data.data.total ? this.total = res.data.data.total : this.total = 0;
+            },
+            remoteMethodReg(query) {
+                if (!!!query) {
+                    this.regList = [];
+                } else {
+                    this.loading = true;
+                    setTimeout(async () => {
+                        this.loading = false;
+                        let res = await axios.post('/reg/list');
+                        !!res.data.data.list ? this.regList = res.data.data.list : this.regList = [];
+                        this.regList = this.regList.filter(item => {
+                            return item.id.indexOf(query) > -1;
+                        });
+                    }, 200);
+                }
+            }
+        },
+        mounted() {
+            this.getDiaInfo();
+        }
+    })
+</script>
+</html>

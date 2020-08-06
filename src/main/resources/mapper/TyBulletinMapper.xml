@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ty.pethospital.Mapper.TyBulletinMapper">
+    <resultMap id="BaseResultMap" type="com.ty.pethospital.Entity.TyBulletin">
+        <!--@mbg.generated-->
+        <!--@Table ty_bulletin-->
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="createTime" jdbcType="TIMESTAMP" property="createtime"/>
+        <result column="userId" jdbcType="VARCHAR" property="userid"/>
+        <result column="userName" jdbcType="VARCHAR" property="userName"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, content, title, createTime, userId
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ty_bulletin
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        <!--@mbg.generated-->
+        delete from ty_bulletin
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.ty.pethospital.Entity.TyBulletin">
+        <!--@mbg.generated-->
+        insert into ty_bulletin (id, content, title,
+        createTime, userId)
+        values (#{id,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR},
+        #{createtime,jdbcType=TIMESTAMP}, #{userid,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.ty.pethospital.Entity.TyBulletin">
+        <!--@mbg.generated-->
+        insert into ty_bulletin
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="createtime != null">
+                createTime,
+            </if>
+            <if test="userid != null">
+                userId,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                #{createtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userid != null">
+                #{userid,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ty.pethospital.Entity.TyBulletin">
+        <!--@mbg.generated-->
+        update ty_bulletin
+        <set>
+            <if test="content != null">
+                content = #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                createTime = #{createtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userid != null">
+                userId = #{userid,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ty.pethospital.Entity.TyBulletin">
+        <!--@mbg.generated-->
+        update ty_bulletin
+        set content = #{content,jdbcType=VARCHAR},
+        title = #{title,jdbcType=VARCHAR},
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+        userId = #{userid,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="findByAll" resultMap="BaseResultMap">
+        select b.*,user.userName
+        from ty_bulletin b LEFT JOIN ty_user user on b.userId=user.id
+        <where>
+            <if test="id != null">
+                and b.id=#{id,jdbcType=VARCHAR}
+            </if>
+            <if test="content != null">
+                and b.content=#{content,jdbcType=VARCHAR}
+            </if>
+            <if test="title != null and title!=''">
+                and b.title like concat('%',#{title,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="createtime != null">
+                and b.createTime=#{createtime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="userid != null">
+                and b.userId=#{userid,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by b.createTime desc
+    </select>
+</mapper>

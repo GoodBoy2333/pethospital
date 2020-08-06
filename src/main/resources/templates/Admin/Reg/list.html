@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <!--公共头部引入-->
+    <div th:replace="Common/head :: head"></div>
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <el-main>
+            <el-form :inline="true" :model="search">
+                <el-form-item label="宠物名">
+                    <el-input v-model="search.petname" placeholder="宠物名"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="getRegInfo" icon="el-icon-search" round>查询</el-button>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="action = true" icon="el-icon-plus" round>新增</el-button>
+                </el-form-item>
+            </el-form>
+
+            <el-table
+                    :data="regList"
+                    empty-text="挂号列表为空">
+                <el-table-column prop="id" label="编号"></el-table-column>
+                <el-table-column prop="desc" label="挂号简介">
+                    <template slot-scope="scope">
+                        {{ scope.row.desc}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="petname" label="宠物名称"></el-table-column>
+                <el-table-column prop="regstatus" label="状态"></el-table-column>
+                <el-table-column prop="username" label="所属用户"></el-table-column>
+                <el-table-column prop="registerTime" label="预约时间"></el-table-column>
+                <el-table-column fixed="right" label="操作" width="150">
+                    <template slot-scope="scope">
+                        <el-button
+                                size="mini"
+                                @click="handleEdit(scope.$index, scope.row)">编辑
+                        </el-button>
+                        <el-button
+                                size="mini"
+                                type="danger"
+                                @click="handleDelete(scope.$index, scope.row)">删除
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination
+                    class="pull-right"
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="currentPage"
+                    :page-sizes="[5, 10, 20, 30, 40]"
+                    :page-size="pageSize"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+            </el-pagination>
+
+           <el-dialog
+                    title="操作"
+                    :visible.sync="action"
+                    :modal="false"
+                    width="40%"
+                    top="0vh"
+                    @close="handleClose">
+                <el-form ref="actionForm" :model="actionObj" :rules="rules" label-width="80px">
+                    <el-form-item label="挂号简介" prop="desc">
+                        <el-input type="textarea" v-model="actionObj.desc"></el-input>
+                    </el-form-item>
+                    <el-form-item label="挂号状态" prop="status">
+                        <el-select v-model="actionObj.status" placeholder="请选择挂号状态">
+                            <el-option label="预约中" value="reging"></el-option>
+                            <el-option label="预约成功" value="regsuccess"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="预约时间" prop="registerTime">
+                        <el-date-picker
+                                v-model="actionObj.registerTime"
+                                type="datetime"
+                                placeholder="选择日期时间"
+                                value-format="yyyy-MM-dd HH:mm">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="用户名" prop="userid">
+                        <el-select v-model="actionObj.userid" clearable filterable remote placeholder="请输入用户名"
+                                   :remote-method="remoteMethod" :loading="loading">
+                            <el-option
+                                    v-for="(item, index) in userList"
+                                    :key="index"
+                                    :label="item.username"
+                                    :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="宠物名" prop="petid">
+                        <el-select v-model="actionObj.petid" clearable filterable remote placeholder="请输入宠物名"
+                                   :remote-method="remoteMethodPet" :loading="loadingPet">
+                            <el-option
+                                    v-for="(item, index) in petList"
+                                    :key="index"
+                                    :label="item.name"
+                                    :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="action = false">取 消</el-button>
+                    <el-button type="primary" @click="handleAction">确 定</el-button>
+                </span>
+            </el-dialog>
+        </el-main>
+    </el-container>
+</div>
+</body>
+<!--公共底部部引入-->
+<div th:replace="Common/footer :: footer"></div>
+<script>
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                currentPage: 1,
+                pageSize: 5,
+                total: 0,
+                regList: [],
+                userList: [],
+                petList: [],
+                search: {
+                    petname: null
+                },
+                loading: false,
+                loadingPet: false,
+                action: false,
+                actionObj: {},
+                rules: {
+                    desc: [
+                        {required: true, message: '请输入挂号简介', trigger: 'blur'},
+                        {min: 10, max: 150, message: '长度在 10 到 150 个字符', trigger: 'blur'}
+                    ],
+                    status: [
+                        {required: true, message: '请选择挂号状态', trigger: 'change'},
+                    ],
+                    userid: [
+                        {required: true, message: '请选择所属用户', trigger: 'blur'},
+                    ],
+                    petid: [
+                        {required: true, message: '请选择宠物', trigger: 'blur'},
+                    ],
+                    registerTime: [
+                        {required: true, message: '请选择预约时间', trigger: 'blur'},
+                    ],
+                },
+            }
+        },
+        methods: {
+            handleSizeChange(val) {
+                this.pageSize = val;
+                this.getRegInfo();
+            },
+            handleCurrentChange(val) {
+                this.currentPage = val;
+                this.getRegInfo();
+            },
+            handleClose() {
+                this.actionObj = {};
+                this.userList = [];
+                this.petList = [];
+                this.$refs['actionForm'].clearValidate();
+                this.getRegInfo();
+            },
+            handleEdit(index, row) {
+                this.action = true;
+                this.userList.push({username:row.username,id:row.userid});
+                this.petList.push({name:row.petname,id:row.petid});
+                this.actionObj = JSON.parse(JSON.stringify(row));
+            },
+            handleDelete(index, row) {
+                this.$confirm('确定删除该记录吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(async () => {
+                    let res = await axios.delete('/reg/' + row.id, Qs.stringify(this.actionObj));
+                    if (res.data.status == 1) {
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                        this.getRegInfo();
+                    } else {
+                        this.$message.error('删除失败，错误：' + res.data.message);
+                    }
+
+                });
+            },
+            async handleAction() {
+                this.$refs['actionForm'].validate(async (valid) => {
+                    if (valid) {
+                        let res = await axios.post('/reg', Qs.stringify(this.actionObj));
+                        if (res.data.status == 1) {
+                            this.$message({
+                                showClose: true,
+                                duration: 1000,
+                                message: '操作成功',
+                                type: 'success'
+                            });
+                            this.action = false;
+                            this.getRegInfo();
+                        } else {
+                            this.$message({
+                                showClose: true,
+                                message: '操作失败：' + res.data.message,
+                                type: 'error'
+                            });
+                        }
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            async getRegInfo() {
+                let res = await axios.post('/reg/list', Qs.stringify({
+                    currentPage: this.currentPage,
+                    pageSize: this.pageSize,
+                    petname: this.search.petname
+                }));
+                !!res.data.data.list ? this.regList = res.data.data.list : this.regList = [];
+                !!res.data.data.total ? this.total = res.data.data.total : this.total = 0;
+            },
+            remoteMethod(query) {
+                if (!!!query) {
+                    this.userList = [];
+                } else {
+                    this.loading = true;
+                    setTimeout(async () => {
+                        this.loading = false;
+                        let res = await axios.post('/user/list', Qs.stringify({
+                            username: query
+                        }));
+                        !!res.data.data.list ? this.userList = res.data.data.list : this.userList = [];
+                    }, 200);
+                }
+            },
+            remoteMethodPet(query) {
+                if (!!!query) {
+                    this.petList = [];
+                } else {
+                    this.loading = true;
+                    setTimeout(async () => {
+                        this.loading = false;
+                        let res = await axios.post('/pet/list',Qs.stringify({name:query}));
+                        !!res.data.data.list ? this.petList = res.data.data.list : this.petList = [];
+                    }, 200);
+                }
+            }
+        },
+        mounted() {
+            this.getRegInfo();
+        }
+    })
+</script>
+</html>

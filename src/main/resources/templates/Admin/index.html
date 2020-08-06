@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <!--公共头部引入-->
+    <div th:replace="Common/head :: head"></div>
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <el-header>
+            <el-row style="line-height: 70px">
+                <el-col :span="12" style="font-family: 华文楷体;font-size: 50px;">
+                    <i class="el-icon-s-promotion"></i>宠物医院管理系统
+                </el-col>
+                <el-col :span="12" style="text-align: right">
+                    <el-dropdown>
+                        <el-avatar
+                                src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item>{{user.nickname?user.nickname:'用户'}}</el-dropdown-item>
+                            <el-dropdown-item @click.native="editInfo('pwd')">修改密码</el-dropdown-item>
+                            <el-dropdown-item @click.native="editInfo('info')">修改信息</el-dropdown-item>
+                            <el-dropdown-item @click.native="logout">注销登录</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </el-col>
+            </el-row>
+        </el-header>
+        <el-container>
+            <el-aside width="200px">
+                <el-menu :default-openeds="['1', '2', '3', '4', '5', '6', '7']" @select="handleSelect">
+                    <el-submenu index="1">
+                        <template slot="title"><i class="el-icon-user"></i>用户管理</template>
+                        <el-menu-item lable="用户列表" url="/user/toList">用户列表</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="2">
+                        <template slot="title"><i class="el-icon-picture-outline-round"></i>宠物管理</template>
+                        <el-menu-item lable="宠物列表" url="/pet/toList">宠物列表</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="3">
+                        <template slot="title"><i class="el-icon-s-operation"></i>挂号管理</template>
+                        <el-menu-item lable="挂号列表" url="/reg/toList">挂号列表</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="4">
+                        <template slot="title"><i class="el-icon-s-ticket"></i>就诊记录管理</template>
+                        <el-menu-item lable="就诊列表" url="/dia/toList">就诊列表</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="5">
+                        <template slot="title"><i class="el-icon-s-check"></i>领养寄养管理</template>
+                        <el-menu-item lable="领养寄养列表" url="/wach/toList">领养寄养列表</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="6">
+                        <template slot="title"><i class="el-icon-s-flag"></i>网站公告管理</template>
+                        <el-menu-item lable="公告列表" url="/bul/toList">公告列表</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="7">
+                        <template slot="title"><i class="el-icon-setting"></i>用户留言管理</template>
+                        <el-menu-item lable="留言列表" url="/mes/toList">留言列表</el-menu-item>
+                    </el-submenu>
+                </el-menu>
+            </el-aside>
+            <el-main>
+                <el-tabs v-model="editableTabsValue" type="card" @tab-remove="removeTab">
+                    <el-tab-pane
+                            v-for="(item, index) in editableTabs"
+                            :key="item.name"
+                            :label="item.title"
+                            :name="item.name"
+                            :closable="item.closable">
+                        <iframe :src="item.content" style="width: 100%;height: 800px" frameborder="0"></iframe>
+                    </el-tab-pane>
+                </el-tabs>
+            </el-main>
+        </el-container>
+    </el-container>
+
+    <el-dialog
+            title="修改"
+            :visible.sync="action"
+            :modal="false"
+            width="40%"
+            @close="handleClose">
+        <el-form ref="actionForm" :model="user" :rules="rules" label-width="80px">
+            <el-form-item label="用户名" prop="username" v-if="actionType=='info'">
+                <el-input v-model="user.username"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="password" v-if="actionType=='pwd'">
+                <el-input type="password" v-model="user.password"></el-input>
+            </el-form-item>
+            <el-form-item label="确认密码" prop="password2" v-if="actionType=='pwd'">
+                <el-input type="password" v-model="user.password2"></el-input>
+            </el-form-item>
+            <el-form-item label="昵称" prop="nickname" v-if="actionType=='info'">
+                <el-input v-model="user.nickname"></el-input>
+            </el-form-item>
+            <el-form-item label="手机" prop="phone" v-if="actionType=='info'">
+                <el-input v-model="user.phone"></el-input>
+            </el-form-item>
+            <el-form-item label="邮箱" prop="email" v-if="actionType=='info'">
+                <el-input v-model="user.email"></el-input>
+            </el-form-item>
+            <el-form-item label="生日" prop="birthday" v-if="actionType=='info'">
+                <el-date-picker type="date" v-model="user.birthday"
+                                value-format="yyyy-MM-dd"></el-date-picker>
+            </el-form-item>
+            <el-form-item label="性别" prop="sex" v-if="actionType=='info'">
+                <el-select v-model="user.sex" placeholder="请选择性别">
+                    <el-option label="男" value="1"></el-option>
+                    <el-option label="女" value="0"></el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+                    <el-button @click="action = false">取 消</el-button>
+                    <el-button type="primary" @click="handleAction">确 定</el-button>
+                </span>
+    </el-dialog>
+</div>
+</body>
+<!--公共底部部引入-->
+<div th:replace="Common/footer :: footer"></div>
+<script>
+    new Vue({
+        el: "#app",
+        data() {
+            var checkPassword = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请再次输入密码'));
+                } else if (value !== this.user.password) {
+                    callback(new Error('两次输入密码不一致!'));
+                } else {
+                    callback();
+                }
+            };
+            var checkUserPhone = async (rule, value, callback) => {
+                if (!value) {
+                    callback(new Error('请输入手机号码'));
+                } else if (!(/^1[3456789]\d{9}$/.test(value))) {
+                    callback(new Error('手机号码有误'));
+                } else {
+                    callback();
+                }
+            };
+            return {
+                user: {},
+                editableTabsValue: '1',
+                editableTabs: [{
+                    title: '首页',
+                    name: '1',
+                    content: '/admin/info',
+                    closable: false
+                }],
+                tabIndex: 1,
+                action: false,
+                actionType: '',
+                rules: {
+                    username: [
+                        {required: true, message: '请输入用户名', trigger: 'blur'},
+                    ],
+                    nickname: [
+                        {required: true, message: '请输入昵称', trigger: 'blur'},
+                    ],
+                    password: [
+                        {required: true, message: '请输入密码', trigger: 'blur'},
+                        {min: 6, max: 12, message: '长度在 6 到 12 个字符', trigger: 'blur'}
+                    ],
+                    password2: [
+                        {validator: checkPassword, trigger: ['blur', 'change']},
+                    ],
+                    phone: [
+                        {validator: checkUserPhone, trigger: 'blur'},
+                    ],
+                    email: [
+                        {required: true, message: '请输入邮箱地址', trigger: 'blur'},
+                        {type: 'email', message: '请输入正确的邮箱地址', trigger: ['change']}
+                    ],
+                    birthday: [
+                        {required: true, message: '请选择生日', trigger: 'blur'},
+                    ],
+                    sex: [
+                        {required: true, message: '请选择性别', trigger: 'change'},
+                    ],
+                },
+            }
+        },
+        methods: {
+            handleSelect(key, keyPath, ele) {
+                if (!!ele.$attrs.lable && !!ele.$attrs.url) {
+                    this.handleNodeClick({
+                        label: ele.$attrs.lable,
+                        url: ele.$attrs.url
+                    });
+                }
+            },
+            //修改信息
+            editInfo(type) {
+                if (!!this.user) {
+                    this.actionType = type;
+                    this.action = true;
+                }
+            },
+            handleClose() {
+                // resetField
+                this.$refs['actionForm'].clearValidate();
+                this.setUser();
+            },
+            async handleAction() {
+                this.$refs['actionForm'].validate(async (valid) => {
+                    if (valid) {
+                        let res = await axios.post('/user', Qs.stringify(this.user));
+                        if (res.data.status == 1) {
+                            this.$message({
+                                message: '修改成功',
+                                type: 'success'
+                            });
+                            this.action = false;
+                        } else {
+                            this.$message.error('修改失败，错误：' + res.data.message);
+                        }
+                    }
+                });
+            },
+            logout() {
+                axios.get("/logout");
+                location.href = "/";
+                sessionStorage.clear();
+            },
+            //标签页处理
+            handleNodeClick(data) {
+                if (!data.children) {
+                    //取得当前已打开的tab页
+                    let tabs = this.editableTabs;
+                    let flag = true;//表示可以新打开
+                    tabs.forEach((tab, index) => {
+                        if (tab.title === data.label) {
+                            //如果打开则选中
+                            this.editableTabsValue = tab.name;
+                            flag = false;
+                            return;
+                        }
+                    });
+                    if (flag) {//如果没有打开则添加
+                        let newTabName = ++this.tabIndex + '';
+                        this.editableTabs.push({
+                            title: data.label,
+                            name: newTabName,
+                            content: data.url,
+                            closable: true
+                        });
+                        this.editableTabsValue = newTabName;
+                    }
+                }
+            },
+            //标签页移除
+            removeTab(targetName) {
+                let tabs = this.editableTabs;
+                let activeName = this.editableTabsValue;
+                if (activeName === targetName) {
+                    tabs.forEach((tab, index) => {
+                        if (tab.name === targetName) {
+                            let nextTab = tabs[index + 1] || tabs[index - 1];
+                            if (nextTab) {
+                                activeName = nextTab.name;
+                            }
+                        }
+                    });
+                }
+                this.editableTabsValue = activeName;
+                this.editableTabs = tabs.filter(tab => tab.name !== targetName);
+            },
+            setUser() {
+                this.user = sessionStorage.getItem("user");
+                if (this.user) {
+                    this.user = JSON.parse(this.user);
+                    this.user.password = '';
+                    this.user.authorities = '';
+                }
+            }
+        },
+        mounted() {
+            this.setUser();
+        }
+    })
+</script>
+</html>

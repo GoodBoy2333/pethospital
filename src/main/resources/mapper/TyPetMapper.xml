@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ty.pethospital.Mapper.TyPetMapper">
+    <resultMap id="BaseResultMap" type="com.ty.pethospital.Entity.TyPet">
+        <!--@mbg.generated-->
+        <!--@Table ty_pet-->
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="imgPath" jdbcType="VARCHAR" property="imgpath"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="age" jdbcType="INTEGER" property="age"/>
+        <result column="desc" jdbcType="VARCHAR" property="desc"/>
+        <result column="createTime" jdbcType="TIMESTAMP" property="createtime"/>
+        <result column="userId" jdbcType="VARCHAR" property="userid"/>
+        <result column="gender" jdbcType="VARCHAR" property="gender"/>
+        <result column="userName" jdbcType="VARCHAR" property="username"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, `name`, imgPath, `type`, age, `desc`, createTime, userId,gender
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ty_pet
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        <!--@mbg.generated-->
+        delete from ty_pet
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.ty.pethospital.Entity.TyPet">
+        <!--@mbg.generated-->
+        insert into ty_pet (id, `name`, imgPath,
+        `type`, age, `desc`, createTime,
+        userId,gender)
+        values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{imgpath,jdbcType=VARCHAR},
+        #{type,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, #{desc,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP},
+        #{userid,jdbcType=VARCHAR}),#{gender,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.ty.pethospital.Entity.TyPet">
+        <!--@mbg.generated-->
+        insert into ty_pet
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                `name`,
+            </if>
+            <if test="imgpath != null">
+                imgPath,
+            </if>
+            <if test="type != null">
+                `type`,
+            </if>
+            <if test="age != null">
+                age,
+            </if>
+            <if test="desc != null">
+                `desc`,
+            </if>
+            <if test="createtime != null">
+                createTime,
+            </if>
+            <if test="userid != null">
+                userId,
+            </if>
+            <if test="gender != null">
+                gender,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="imgpath != null">
+                #{imgpath,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null">
+                #{age,jdbcType=INTEGER},
+            </if>
+            <if test="desc != null">
+                #{desc,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                #{createtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userid != null">
+                #{userid,jdbcType=VARCHAR},
+            </if>
+            <if test="gender != null">
+                #{gender,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ty.pethospital.Entity.TyPet">
+        update ty_pet
+        <set>
+            <if test="name != null">
+                `name` = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="imgpath != null">
+                imgPath = #{imgpath,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                `type` = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null">
+                age = #{age,jdbcType=INTEGER},
+            </if>
+            <if test="desc != null">
+                `desc` = #{desc,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                createTime = #{createtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userid != null">
+                userId = #{userid,jdbcType=VARCHAR},
+            </if>
+            <if test="gender != null">
+                gender = #{gender,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ty.pethospital.Entity.TyPet">
+        update ty_pet
+        set `name` = #{name,jdbcType=VARCHAR},
+        imgPath = #{imgpath,jdbcType=VARCHAR},
+        `type` = #{type,jdbcType=VARCHAR},
+        age = #{age,jdbcType=INTEGER},
+        `desc` = #{desc,jdbcType=VARCHAR},
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+        userId = #{userid,jdbcType=VARCHAR},
+        gender = #{gender,jdbcType=VARCHAR},
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="findByAll" resultMap="BaseResultMap">
+        select pet.*,user.userName
+        from ty_pet pet left join ty_user user on pet.userId=user.id
+        <where>
+            <if test="id != null">
+                and id=#{id,jdbcType=VARCHAR}
+            </if>
+            <if test="name != null and name!=''">
+                and `name` like concat('%',#{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="imgpath != null">
+                and imgPath=#{imgpath,jdbcType=VARCHAR}
+            </if>
+            <if test="type != null">
+                and `type`=#{type,jdbcType=VARCHAR}
+            </if>
+            <if test="age != null">
+                and age=#{age,jdbcType=INTEGER}
+            </if>
+            <if test="desc != null">
+                and `desc`=#{desc,jdbcType=VARCHAR}
+            </if>
+            <if test="createtime != null">
+                and createTime=#{createtime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="userid != null and userid!=''">
+                and userId=#{userid,jdbcType=VARCHAR}
+            </if>
+            <if test="gender != null">
+                and gender=#{gender,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateImgpathById">
+        update ty_pet
+        set imgPath=#{updatedImgpath,jdbcType=VARCHAR}
+        where id=#{id,jdbcType=VARCHAR}
+    </update>
+</mapper>

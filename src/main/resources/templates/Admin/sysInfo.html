@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <!--公共头部引入-->
+    <div th:replace="Common/head :: head"></div>
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <el-aside width="120px">
+            <el-row v-for="(item,index) in bulList" :key="index">
+                <el-link type="info" style="font-size: 15px;" @click="open(item)">{{item.title}}</el-link>
+            </el-row>
+        </el-aside>
+        <el-main>
+            <el-calendar v-model="value">
+            </el-calendar>
+        </el-main>
+    </el-container>
+</div>
+</body>
+<!--公共底部部引入-->
+<div th:replace="Common/footer :: footer"></div>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            value: new Date(),
+            bulList:[]
+        },
+        methods: {
+            async getBulInfo() {
+                let res = await axios.post('/bul/list');
+                !!res.data.data.list ? this.bulList = res.data.data.list : this.bulList = [];
+            },
+            open(item) {
+                this.$notify({
+                    title: item.title,
+                    message: item.content,
+                    duration: 0
+                });
+            }
+        },
+        mounted() {
+            this.getBulInfo();
+        }
+    })
+</script>
+</html>
